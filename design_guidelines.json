@@ -1,0 +1,171 @@
+{
+  "identity": {
+    "name": "Rentify",
+    "persona": "E1 - The Anti-AI Designer",
+    "tone": "Modern Trust",
+    "archetype": "Organic & Earthy (Trust, Growth, Calm)",
+    "mission": "Build a professional, trustworthy, and highly functional real estate platform that balances data density with emotional resonance."
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["600", "700", "800"],
+      "usage": "Use for all section headers, hero titles, and modal titles. Tracking tight (-0.02em).",
+      "fallback": "sans-serif"
+    },
+    "body": {
+      "font_family": "Inter, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "Use for all paragraph text, form labels, and data tables.",
+      "fallback": "sans-serif"
+    },
+    "mono": {
+      "font_family": "JetBrains Mono, monospace",
+      "usage": "Use for property IDs, transaction codes, and technical specs.",
+      "fallback": "monospace"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "name": "Deep Forest",
+        "hex": "#064e3b",
+        "tailwind": "emerald-900",
+        "usage": "Brand headers, primary navigation, active states for tabs."
+      },
+      "secondary": {
+        "name": "Warm Stone",
+        "hex": "#f5f5f4",
+        "tailwind": "stone-100",
+        "usage": "Page backgrounds, secondary buttons, card backgrounds."
+      },
+      "accent": {
+        "name": "Copper",
+        "hex": "#b45309",
+        "tailwind": "amber-700",
+        "usage": "Highlights, premium badges, 'New' tags."
+      },
+      "action": {
+        "name": "Electric Blue",
+        "hex": "#2563eb",
+        "tailwind": "blue-600",
+        "usage": "Primary CTAs (Buttons), Links, Focus rings."
+      },
+      "neutral": {
+        "surface": "#ffffff",
+        "border": "#e5e7eb",
+        "text_primary": "#0f172a",
+        "text_secondary": "#64748b"
+      }
+    },
+    "gradients": {
+      "hero_overlay": "linear-gradient(180deg, rgba(6, 78, 59, 0.8) 0%, rgba(6, 78, 59, 0.4) 100%)",
+      "card_hover": "linear-gradient(45deg, rgba(245, 245, 244, 0.5) 0%, rgba(255, 255, 255, 0) 100%)"
+    }
+  },
+  "layout_strategies": {
+    "marketing": {
+      "grid": "Tetris Grid (Mode A)",
+      "spacing": "Generous (p-12 to p-24)",
+      "container": "max-w-7xl mx-auto",
+      "rules": [
+        "Use asymmetry in hero sections.",
+        "Overlap images with text blocks using negative margins.",
+        "Never center-align long paragraphs."
+      ]
+    },
+    "dashboard": {
+      "grid": "Bento Grid (Mode B)",
+      "spacing": "Compact (p-6)",
+      "container": "w-full px-6",
+      "rules": [
+        "Use 'stone-50' background for the dashboard area to differentiate from white cards.",
+        "Cards must have sharp corners or minimal rounding (rounded-md).",
+        "Dense data tables with sticky headers."
+      ]
+    },
+    "forms": {
+      "style": "Wizard Step",
+      "layout": "Split Screen (Left: Form, Right: Live Preview)",
+      "rules": [
+        "Group related fields into 'Fieldsets' with clear legends.",
+        "Use 'stone-100' for input backgrounds to make them distinct from the white card.",
+        "Validation messages must be inline and clear."
+      ]
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-3 font-semibold shadow-lg hover:shadow-blue-500/30 transition-all",
+      "secondary": "bg-stone-100 hover:bg-stone-200 text-emerald-900 rounded-full px-6 py-3 font-medium border border-stone-200",
+      "ghost": "text-slate-600 hover:text-emerald-900 hover:bg-stone-50 rounded-md px-4 py-2"
+    },
+    "cards": {
+      "property": "bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group",
+      "metric": "bg-white border border-stone-100 rounded-lg p-6 shadow-sm flex flex-col justify-between"
+    },
+    "inputs": {
+      "default": "bg-stone-50 border-stone-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md h-12 px-4 transition-all"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "soft": "0 4px 20px -2px rgba(6, 78, 59, 0.05)",
+      "hard": "4px 4px 0px 0px rgba(6, 78, 59, 0.1)"
+    },
+    "textures": {
+      "noise": "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E\")"
+    },
+    "animations": {
+      "hover_lift": "transform transition-transform duration-300 hover:-translate-y-1",
+      "fade_in": "animate-in fade-in duration-500 slide-in-from-bottom-4"
+    }
+  },
+  "image_urls": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1766603636562-531bb3e1dda8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBsdXh1cnklMjBob21lJTIwZXh0ZXJpb3IlMjBhcmNoaXRlY3R1cmV8ZW58MHx8fHwxNzcwMjMyNTQ2fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Modern luxury home exterior with wooden facade and stone accents",
+      "category": "hero"
+    },
+    "feature_interior": {
+      "url": "https://images.unsplash.com/photo-1757262798620-c2cc40cfb440?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTJ8MHwxfHNlYXJjaHwxfHxtaW5pbWFsaXN0JTIwYnJpZ2h0JTIwbGl2aW5nJTIwcm9vbSUyMGludGVyaW9yJTIwZGVzaWdufGVufDB8fHx8MTc3MDIzMjU1Mnww&ixlib=rb-4.1.0&q=85",
+      "description": "Spacious modern living room with large sectional sofa",
+      "category": "feature"
+    },
+    "happy_users": {
+      "url": "https://images.unsplash.com/photo-1758523671087-b256bbbca475?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzF8MHwxfHNlYXJjaHwxfHxoYXBweSUyMGNvdXBsZSUyMG1vdmluZyUyMGludG8lMjBuZXclMjBob21lJTIwYm94ZXN8ZW58MHx8fHwxNzcwMjMyNTYxfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Young happy couple talking while standing at their new home",
+      "category": "testimonial"
+    },
+    "agent_action": {
+      "url": "https://images.unsplash.com/photo-1649223543462-4ab56081e3c9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNzl8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjByZWFsJTIwZXN0YXRlJTIwYWdlbnQlMjBob2xkaW5nJTIwa2V5c3xlbnwwfHx8fDE3NzAyMzI1NTd8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Person holding a small key in their hand",
+      "category": "action"
+    }
+  },
+  "instructions_to_main_agent": [
+    "Use 'Manrope' for all headings. Import it from Google Fonts.",
+    "Implement the 'Wizard' form pattern for the 'Create Listing' page. Do not dump all fields on one page.",
+    "Use the 'Deep Forest' green (#064e3b) sparingly for high-impact headers and primary navigation.",
+    "Ensure the Dashboard uses the 'Bento Grid' layout with 'Warm Stone' backgrounds.",
+    "Use the provided image URLs for the Landing Page hero and feature sections.",
+    "For the 'Property Detail' page, use a large masonry grid for the image gallery.",
+    "Add 'data-testid' to all interactive elements (buttons, inputs, links)."
+  ],
+  "universal_guidelines": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy.",
+    "Use glass-morphism effects with backdrop filters (12-24px blur).",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms.",
+    "You MUST NOT center align the app container.",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations.",
+    "NEVER use AI assistant Emoji characters for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations.",
+    "Prioritize using pre-existing components from src/components/ui when applicable.",
+    "Components MUST use named exports.",
+    "Use 'sonner' for toasts."
+  ]
+}
