@@ -14,6 +14,7 @@ const PROPERTY_TYPES = {
   Industrial: ['Factory', 'Industrial Shed', 'Industrial Plot', 'Manufacturing Unit'],
   Agricultural: ['Farm Land', 'Orchard', 'Agricultural Plot'],
   Institutional: ['School', 'Hospital', 'College', 'Government Building'],
+  'PG/Co-living': ['Boys PG', 'Girls PG', 'Co-living', 'Student Housing'],
 };
 
 const PLOT_KEYWORDS = ['Plot', 'Land', 'Farm'];
@@ -57,6 +58,16 @@ const CreateProperty = ({ user, onLogout }) => {
     near_metro: false,
     has_security: false,
     has_cctv: false,
+    has_wifi: false,
+    has_ac: false,
+    has_geyser: false,
+    has_video_doorbell: false,
+    has_fire_safety: false,
+    has_intercom: false,
+    tenant_preference: 'Any',
+    listed_by: 'Owner',
+    contact_name: user?.name || '',
+    contact_phone: user?.phone || '',
     images: [],
   });
 
@@ -71,22 +82,22 @@ const CreateProperty = ({ user, onLogout }) => {
     maxSize: 5242880, // 5MB
     onDrop: async (acceptedFiles) => {
       const uploadedImages = [];
-      
+
       for (const file of acceptedFiles) {
         try {
           const formDataUpload = new FormData();
           formDataUpload.append('file', file);
-          
+
           const response = await axios.post(`${API}/upload-image`, formDataUpload, {
             headers: { 'Content-Type': 'multipart/form-data' },
           });
-          
+
           uploadedImages.push(response.data.image_url);
         } catch (error) {
           toast.error(`Failed to upload ${file.name}`);
         }
       }
-      
+
       setFormData({ ...formData, images: [...formData.images, ...uploadedImages] });
       setImageFiles([...imageFiles, ...acceptedFiles]);
     },
@@ -150,9 +161,8 @@ const CreateProperty = ({ user, onLogout }) => {
           {[1, 2, 3, 4].map((num) => (
             <div key={num} className="flex items-center">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                  step >= num ? 'bg-blue-600 text-white' : 'bg-stone-200 text-slate-600'
-                }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${step >= num ? 'bg-blue-600 text-white' : 'bg-stone-200 text-slate-600'
+                  }`}
                 data-testid={`step-indicator-${num}`}
               >
                 {num}
@@ -231,6 +241,77 @@ const CreateProperty = ({ user, onLogout }) => {
                         </option>
                       ))}
                     </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Tenant Preference
+                    </label>
+                    <select
+                      value={formData.tenant_preference}
+                      onChange={(e) => setFormData({ ...formData, tenant_preference: e.target.value })}
+                      className="w-full bg-stone-50 border-stone-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md h-12 px-4 transition-all"
+                      data-testid="tenant-preference-select"
+                    >
+                      <option value="Any">Any</option>
+                      <option value="Family">Family</option>
+                      <option value="Bachelor">Bachelor</option>
+                      <option value="Students">Students</option>
+                      <option value="Company Lease">Company Lease</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Listed By
+                    </label>
+                    <div className="flex space-x-4">
+                      {['Owner', 'Broker', 'Builder'].map((type) => (
+                        <label key={type} className="flex items-center space-x-2 cursor-pointer bg-stone-50 px-4 py-3 rounded-md border border-stone-200">
+                          <input
+                            type="radio"
+                            name="listed_by"
+                            value={type}
+                            checked={formData.listed_by === type}
+                            onChange={(e) => setFormData({ ...formData, listed_by: e.target.value })}
+                            className="text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-sm font-medium text-slate-700">{type}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2 grid md:grid-cols-2 gap-6 bg-blue-50 p-6 rounded-lg border border-blue-100">
+                    <div className="md:col-span-2">
+                      <h3 className="text-sm font-semibold text-blue-900 mb-4 flex items-center">
+                        Contact Details
+                      </h3>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Contact Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.contact_name}
+                        onChange={(e) => setFormData({ ...formData, contact_name: e.target.value })}
+                        className="w-full bg-white border-stone-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md h-12 px-4"
+                        placeholder="Name of contact person"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Contact Phone</label>
+                      <input
+                        type="tel"
+                        required
+                        value={formData.contact_phone}
+                        onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
+                        className="w-full bg-white border-stone-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-md h-12 px-4"
+                        placeholder="+91 9876543210"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -580,7 +661,7 @@ const CreateProperty = ({ user, onLogout }) => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      {formData.purpose === 'Rent' ? 'Monthly Rent' : 'Sale Price'} (\u20b9){' '}
+                      {formData.purpose === 'Rent' ? 'Monthly Rent' : 'Sale Price'} (₹){' '}
                       <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -598,7 +679,7 @@ const CreateProperty = ({ user, onLogout }) => {
                   {formData.purpose === 'Rent' && (
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Security Deposit (\u20b9)
+                        Security Deposit (₹)
                       </label>
                       <input
                         type="number"
@@ -613,7 +694,7 @@ const CreateProperty = ({ user, onLogout }) => {
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Maintenance (\u20b9)</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Maintenance (₹)</label>
                     <input
                       type="number"
                       min="0"
@@ -649,6 +730,12 @@ const CreateProperty = ({ user, onLogout }) => {
                       { key: 'near_metro', label: 'Near Metro', testid: 'near-metro-checkbox' },
                       { key: 'has_security', label: '24/7 Security', testid: 'has-security-checkbox' },
                       { key: 'has_cctv', label: 'CCTV Surveillance', testid: 'has-cctv-checkbox' },
+                      { key: 'has_wifi', label: 'WiFi', testid: 'has-wifi-checkbox' },
+                      { key: 'has_ac', label: 'Air Conditioning', testid: 'has-ac-checkbox' },
+                      { key: 'has_geyser', label: 'Geyser', testid: 'has-geyser-checkbox' },
+                      { key: 'has_video_doorbell', label: 'Video Doorbell', testid: 'has-video-doorbell-checkbox' },
+                      { key: 'has_fire_safety', label: 'Fire Safety', testid: 'has-fire-safety-checkbox' },
+                      { key: 'has_intercom', label: 'Intercom', testid: 'has-intercom-checkbox' },
                     ].map((amenity) => (
                       <div key={amenity.key} className="flex items-center bg-stone-50 rounded-lg p-4">
                         <input

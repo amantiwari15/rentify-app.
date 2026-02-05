@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import CreateProperty from './pages/CreateProperty';
 import PropertyDetail from './pages/PropertyDetail';
 import AllProperties from './pages/AllProperties';
@@ -77,6 +78,10 @@ function App() {
           <Route
             path="/dashboard"
             element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/admin"
+            element={user ? <AdminDashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
           />
           <Route
             path="/create-property"

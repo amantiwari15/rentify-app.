@@ -84,9 +84,8 @@ const PropertyDetail = ({ user, onLogout }) => {
                         <button
                           key={index}
                           onClick={() => setCurrentImageIndex(index)}
-                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                            currentImageIndex === index ? 'border-blue-600' : 'border-stone-200'
-                          }`}
+                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 ${currentImageIndex === index ? 'border-blue-600' : 'border-stone-200'
+                            }`}
                         >
                           <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
                         </button>
@@ -106,11 +105,10 @@ const PropertyDetail = ({ user, onLogout }) => {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      property.purpose === 'Rent'
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${property.purpose === 'Rent'
                         ? 'bg-blue-100 text-blue-700'
                         : 'bg-amber-100 text-amber-700'
-                    }`}
+                      }`}
                   >
                     For {property.purpose}
                   </span>
@@ -268,13 +266,16 @@ const PropertyDetail = ({ user, onLogout }) => {
                 )}
               </div>
 
-              <button
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-3 font-semibold shadow-lg hover:shadow-blue-500/30 transition-all mb-3"
-                data-testid="contact-owner-btn"
-                onClick={() => toast.info('Contact feature coming soon!')}
-              >
-                Contact Owner
-              </button>
+              <div className="bg-blue-50 rounded-lg p-4 mb-3 border border-blue-100">
+                <div className="text-sm text-slate-500 mb-1">Listed by {property.listed_by}</div>
+                <div className="font-semibold text-emerald-900 text-lg">{property.contact_name || 'Owner'}</div>
+                {property.contact_phone && (
+                  <a href={`tel:${property.contact_phone}`} className="flex items-center text-blue-600 font-medium mt-1 hover:text-blue-700">
+                    <span className="mr-2">📞</span>
+                    {property.contact_phone}
+                  </a>
+                )}
+              </div>
 
               <button
                 className="w-full bg-stone-100 hover:bg-stone-200 text-emerald-900 rounded-full px-6 py-3 font-semibold border border-stone-200 transition-all"

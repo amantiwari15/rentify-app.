@@ -30,6 +30,14 @@ export const Navbar = ({ user, onLogout }) => {
                 >
                   Dashboard
                 </Link>
+                {user.is_admin && (
+                  <Link
+                    to="/admin"
+                    className="text-purple-600 hover:text-purple-900 font-medium font-bold"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 <Link
                   to="/create-property"
                   className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-2.5 font-semibold shadow-lg hover:shadow-blue-500/30 transition-all"

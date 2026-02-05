@@ -27,7 +27,9 @@ const Register = ({ setUser }) => {
       toast.success('Registration successful!');
       navigate('/dashboard');
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Registration failed');
+      console.error("Registration error:", error);
+      const errorMsg = error.response?.data?.detail || error.message;
+      toast.error(`Failed: ${errorMsg} (URL: ${API}/auth/register)`);
     } finally {
       setLoading(false);
     }

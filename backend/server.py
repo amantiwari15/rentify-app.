@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from passlib.context import CryptContext
 import jwt
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+# from emergentintegrations.llm.chat import LlmChat, UserMessage
 import base64
 import asyncio
 
@@ -20,12 +20,22 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+def log_to_file(msg):
+    with open("debug.log", "a") as f:
+        f.write(f"{datetime.now()}: {msg}\n")
+
+try:
+    mongo_url = os.environ['MONGO_URL']
+    log_to_file(f"Connecting to MongoDB at {mongo_url}")
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[os.environ['DB_NAME']]
+    log_to_file(f"Database selected: {os.environ['DB_NAME']}")
+except Exception as e:
+    log_to_file(f"Failed to initialize MongoDB connection: {e}")
+    raise e
 
 # Security
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 JWT_SECRET = os.environ.get('JWT_SECRET_KEY')
 JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM', 'HS256')
 security = HTTPBearer()
@@ -58,6 +68,7 @@ class User(BaseModel):
     name: str
     email: str
     phone: Optional[str] = None
+    is_admin: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class PropertyListing(BaseModel):
@@ -111,6 +122,20 @@ class PropertyListing(BaseModel):
     near_metro: bool = False
     has_security: bool = False
     has_cctv: bool = False
+    has_wifi: bool = False
+    has_ac: bool = False
+    has_geyser: bool = False
+    has_video_doorbell: bool = False
+    has_fire_safety: bool = False
+    has_intercom: bool = False
+    
+    # Tenant Preference
+    tenant_preference: Optional[str] = None
+    
+    # Ownership & Contact
+    listed_by: str = "Owner"  # Owner, Broker, Builder
+    contact_name: Optional[str] = None
+    contact_phone: Optional[str] = None
     
     # Generated Description
     ai_description: Optional[str] = None
@@ -155,6 +180,17 @@ class PropertyCreate(BaseModel):
     near_metro: bool = False
     has_security: bool = False
     has_cctv: bool = False
+    has_wifi: bool = False
+    has_ac: bool = False
+    has_geyser: bool = False
+    has_video_doorbell: bool = False
+    has_fire_safety: bool = False
+    has_intercom: bool = False
+    has_intercom: bool = False
+    tenant_preference: Optional[str] = None
+    listed_by: str = "Owner"
+    contact_name: Optional[str] = None
+    contact_phone: Optional[str] = None
     images: List[str] = []
 
 # Utility Functions
@@ -189,77 +225,77 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Invalid token")
 
 async def generate_ai_description(property_data: dict) -> str:
-    """Generate SEO-optimized property description using Claude Sonnet 4.5"""
-    try:
-        api_key = os.environ.get('EMERGENT_LLM_KEY')
-        
-        # Build context for AI
-        amenities_list = []
-        if property_data.get('has_lift'): amenities_list.append('Lift')
-        if property_data.get('has_parking'): amenities_list.append('Parking')
-        if property_data.get('has_gym'): amenities_list.append('Gymnasium')
-        if property_data.get('has_pool'): amenities_list.append('Swimming Pool')
-        if property_data.get('near_metro'): amenities_list.append('Near Metro')
-        if property_data.get('has_security'): amenities_list.append('24/7 Security')
-        if property_data.get('has_cctv'): amenities_list.append('CCTV Surveillance')
-        
-        amenities_str = ", ".join(amenities_list) if amenities_list else "Basic amenities"
-        
-        prompt = f"""
-Generate a compelling, SEO-optimized property description for the following listing:
+    """Generate detailed mock description (AI unavailable)"""
+    
+    category = property_data.get('category', 'Residential')
+    prop_type = property_data['property_type']
+    city = property_data['city']
+    locality = property_data['locality']
+    purpose = property_data['purpose']
+    
+    # Common features helper
+    features = []
+    if property_data.get('has_lift'): features.append('Lift')
+    if property_data.get('has_parking'): features.append('Reserved Parking')
+    if property_data.get('has_gym'): features.append('Gymnasium')
+    if property_data.get('has_pool'): features.append('Swimming Pool')
+    if property_data.get('has_wifi'): features.append('High-speed WiFi')
+    if property_data.get('has_ac'): features.append('Air Conditioning')
+    if property_data.get('has_security'): features.append('24/7 Security')
+    if property_data.get('has_cctv'): features.append('CCTV Surveillance')
+    if property_data.get('has_video_doorbell'): features.append('Video Doorbell')
+    if property_data.get('near_metro'): features.append('Near Metro Station')
+    
+    features_str = ", ".join(features) if features else "essential amenities"
 
-Property Type: {property_data['property_type']} ({property_data['category']})
-Purpose: {property_data['purpose']}
-Location: {property_data['locality']}, {property_data['city']} - {property_data['pincode']}
-"""
+    # Listed By Intro
+    listed_by = property_data.get('listed_by', 'Owner')
+    intro_prefix = f"Directly listed by {listed_by}," if listed_by == 'Owner' else f"Listed by {listed_by},"
+
+    # --- AGRICULTURAL TEMPLATE ---
+    if category == 'Agricultural':
+        soil = property_data.get('soil_type', 'fertile')
+        irrigation = property_data.get('irrigation_source', 'natural sources')
+        area = property_data.get('plot_area_acres') or property_data.get('plot_area_sqft')
         
-        if property_data.get('bedrooms'):
-            prompt += f"Bedrooms: {property_data['bedrooms']} BHK\n"
-        if property_data.get('bathrooms'):
-            prompt += f"Bathrooms: {property_data['bathrooms']}\n"
-        if property_data.get('furnishing'):
-            prompt += f"Furnishing: {property_data['furnishing']}\n"
-        if property_data.get('plot_area_sqft'):
-            prompt += f"Plot Area: {property_data['plot_area_sqft']} sq.ft\n"
-        if property_data.get('plot_area_acres'):
-            prompt += f"Plot Area: {property_data['plot_area_acres']} acres\n"
-        if property_data.get('soil_type'):
-            prompt += f"Soil Type: {property_data['soil_type']}\n"
-        if property_data.get('irrigation_source'):
-            prompt += f"Irrigation: {property_data['irrigation_source']}\n"
-        if property_data.get('power_load_kva'):
-            prompt += f"Power Load: {property_data['power_load_kva']} KVA\n"
-        if property_data.get('ceiling_height_ft'):
-            prompt += f"Ceiling Height: {property_data['ceiling_height_ft']} ft\n"
+        p1 = f"{intro_prefix} this Prime {prop_type} available for {purpose} in the peaceful vicinity of {locality}, {city}. This fertile land is perfect for farming, organic cultivation, or as a long-term investment asset. Away from the city noise, it offers a serene environment."
         
-        prompt += f"\nPrice: ₹{property_data['price']:,.0f}"
-        if property_data['purpose'] == 'Rent':
-            prompt += " per month"
-        if property_data.get('deposit'):
-            prompt += f" | Deposit: ₹{property_data['deposit']:,.0f}"
+        p2 = f"The land features {soil} soil tailored for high-yield crops and is supported by {irrigation} for consistent water supply. With an area of approx {area}, it provides ample space for varied agricultural activities or farmhouse construction."
         
-        prompt += f"\nAmenities: {amenities_str}\n"
+        p3 = f"An excellent opportunity for investors and farmers alike. This {prop_type} in {city} holds immense potential for appreciation. Contact us to explore this green investment today!"
+
+    # --- COMMERCIAL / INDUSTRIAL TEMPLATE ---
+    elif category in ['Commercial', 'Industrial']:
+        power = f"{property_data.get('power_load_kva', 0)} KVA power load"
         
-        if property_data.get('landmark'):
-            prompt += f"Landmark: {property_data['landmark']}\n"
+        p1 = f"{intro_prefix} this Strategically located {prop_type} available for {purpose} in the business hub of {locality}, {city}. This property offers high visibility and excellent connectivity, making it an ideal choice for your business operations."
         
-        prompt += "\nWrite a 3-4 paragraph description that highlights the key features, location benefits, and value proposition. Make it engaging and professional."
+        p2 = f"Designed for efficiency, the property comes with {power} and modern infrastructure. It includes {features_str}. The layout is optimized for smooth workflow and logistics, suitable for offices, showrooms, or industrial units."
         
-        # Use Claude Sonnet 4.5
-        chat = LlmChat(
-            api_key=api_key,
-            session_id=f"property_{uuid.uuid4()}",
-            system_message="You are a professional real estate copywriter specializing in SEO-optimized property descriptions."
-        ).with_model("anthropic", "claude-sonnet-4-5-20250929")
+        p3 = f"Boost your business presence in {city} with this premium location. Perfect for startups, established firms, or industrial setups. Schedule a site visit now!"
+
+    # --- PG / CO-LIVING TEMPLATE ---
+    elif category == 'PG/Co-living':
+        tenant = property_data.get('tenant_preference', 'Students & Professionals')
         
-        message = UserMessage(text=prompt)
-        response = await chat.send_message(message)
+        p1 = f"{intro_prefix} budget-friendly and comfortable {prop_type} available in {locality}, {city}. Ideally situated near colleges and IT parks, offering a hassle-free living experience for {tenant}."
         
-        return response
-    except Exception as e:
-        logger.error(f"AI description generation error: {str(e)}")
-        # Fallback description
-        return f"{property_data['property_type']} available for {property_data['purpose']} in {property_data['locality']}, {property_data['city']}. Contact for more details."
+        p2 = f"This fully managed property offers {features_str}. Residents can enjoy a community lifestyle with clean, well-maintained rooms and common areas. High-speed internet and security ensure you can work or study without interruption."
+        
+        p3 = f"Move into a safe and social environment in {city}. Slots are filling fast! Contact us immediately to book your bed/room."
+
+    # --- RESIDENTIAL (Default) ---
+    else:
+        tenant_pref = property_data.get('tenant_preference', 'Anyone')
+        tenant_text = f"Perfectly suited for {tenant_pref}." if tenant_pref and tenant_pref != 'Any' else "Ideal for families and professionals."
+        
+        p1 = f"{intro_prefix} check out this premium {prop_type} available for {purpose} in the heart of {locality}, {city}. This property offers a perfect blend of modern architecture and convenient living. Situated in a prime location, it provides easy access to schools, hospitals, and shopping centers."
+        
+        p2 = f"The property boasts {features_str}. It is spacious, well-ventilated, and designed to provide maximum comfort. Whether you are looking for a peaceful environment or a vibrant community, this property checks all the boxes. The interiors are tastefully done (if furnished), ensuring a luxurious lifestyle."
+        
+        p3 = f"{tenant_text} Don't miss out on this opportunity to live in one of the most sought-after neighborhoods in {city}. Contact us today to schedule a viewing and make this your new home!"
+    
+    return f"{p1}\n\n{p2}\n\n{p3}"
 
 # Routes
 @api_router.get("/")
@@ -432,6 +468,49 @@ async def upload_image(file: UploadFile = File(...), current_user: User = Depend
         return {"image_url": data_uri}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
+
+# Admin Dependency
+async def get_current_admin(current_user: User = Depends(get_current_user)):
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+    return current_user
+
+# Admin Routes
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: User = Depends(get_current_admin)):
+    total_users = await db.users.count_documents({})
+    total_properties = await db.properties.count_documents({})
+    return {"total_users": total_users, "total_properties": total_properties}
+
+@api_router.get("/admin/users")
+async def get_all_users(admin: User = Depends(get_current_admin)):
+    cursor = db.users.find({}, {"_id": 0})
+    users = await cursor.to_list(length=100)
+    return users
+
+@api_router.delete("/admin/users/{user_id}")
+async def admin_delete_user(user_id: str, admin: User = Depends(get_current_admin)):
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User deleted"}
+
+@api_router.get("/admin/properties")
+async def get_all_properties(admin: User = Depends(get_current_admin)):
+    cursor = db.properties.find({}, {"_id": 0})
+    properties = await cursor.to_list(length=100)
+    return properties
+
+@api_router.delete("/admin/properties/{property_id}")
+async def admin_delete_property(property_id: str, admin: User = Depends(get_current_admin)):
+    # Verify property exists
+    prop = await db.properties.find_one({"id": property_id})
+    if not prop:
+        raise HTTPException(status_code=404, detail="Property not found")
+    
+    # Delete from DB
+    await db.properties.delete_one({"id": property_id})
+    return {"message": "Property deleted"}
 
 # Include router
 app.include_router(api_router)
